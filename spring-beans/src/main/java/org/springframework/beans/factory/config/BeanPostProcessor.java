@@ -39,6 +39,11 @@ import org.springframework.beans.BeansException;
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
  */
+
+/**
+ * 工厂钩子允许用户自定义修改创建的bean实例，应用上下文可以在ben的定义中自动检测beanPostProcessor，
+ * 并且将其应用于随后创建的任意bean中，并且可以通过factory给其他的类进行注册然后使用
+ */
 public interface BeanPostProcessor {
 
 	/**
@@ -53,6 +58,13 @@ public interface BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 */
+
+	/**
+	将此BeanPostProcessor应用于任何bean初始化回调之前的给定新bean实例（如InitializingBean的{@code afterPropertiesSet}
+	或自定义init方法）。 该bean将已经使用属性值进行填充。
+	返回的bean实例可能是原始的包装器
+	* @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
+	*/
 	Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
 
 	/**
@@ -74,6 +86,20 @@ public interface BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.beans.factory.FactoryBean
+	 */
+
+	/**
+	 *
+	 *将此BeanPostProcessor应用于任何bean初始化回调之后的给定新Bean实例（如InitializingBean的{@code afterPropertiesSet}
+	 *或自定义init方法）。 该bean将已经使用属性值进行填充。
+	 *返回的bean实例可能是原始的包装器。
+	 * <p>如果是FactoryBean，FactoryBean将调用此回调
+	 *实例和由FactoryBean创建的对象（从Spring 2.0开始）。该
+	 *后处理器可以决定是应用于FactoryBean还是创建
+	 *对象或两者通过相应的{@code bean instanceof FactoryBean}检查。
+	 * <p>这个回调也会在a触发短路之后被调用
+	 * {@link InstantiationAwareBeanPostProcessor＃postProcessBeforeInstantiation}方法，
+	 *与所有其他BeanPostProcessor回调相反。
 	 */
 	Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
 
