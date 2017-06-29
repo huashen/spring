@@ -50,6 +50,14 @@ package org.springframework.beans.factory;
  * @see org.springframework.aop.framework.ProxyFactoryBean
  * @see org.springframework.jndi.JndiObjectFactoryBean
  */
+
+/**
+ * FactoryBean是一个接口，任何一个Bean可以实现这个接口，那么这个bean将成为一个Factory，这个Factory将一些对象暴露出去，
+ * 这些对象不一定是它们自己，返回的是一个Object对象，这个对象将通过getObject()暴露出去，并且支持单例和prototypes.
+ * 这个接口在spring自己的框架中被大篇幅的运用到
+ *
+ * @param <T>
+ */
 public interface FactoryBean<T> {
 
 	/**
