@@ -38,6 +38,10 @@ import org.springframework.beans.BeansException;
  * @see InitializingBean
  * @see org.springframework.context.ApplicationContextAware
  */
+
+/**
+ * 实现这个接口的Bean能够知道自身属于哪一个BeanFactory
+ */
 public interface BeanFactoryAware extends Aware {
 
 	/**

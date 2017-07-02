@@ -33,6 +33,13 @@ package org.springframework.beans.factory;
  * @see BeanFactoryAware
  * @see InitializingBean
  */
+
+/**
+ * 实现该接口的bean会意识到自己在BeanFactory的的名字
+ * 注意虽然这并不值得推荐一个对象依赖它的名字
+ * 因为名字只是这个bean的一个脆弱的依赖或者一个额外的配置
+ * 也有可能这个bean的名称只是用于spring API的一个不必要的依赖
+ */
 public interface BeanNameAware extends Aware {
 
 	/**
