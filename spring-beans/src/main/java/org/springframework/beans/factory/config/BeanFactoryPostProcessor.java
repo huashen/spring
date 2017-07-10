@@ -44,7 +44,7 @@ import org.springframework.beans.BeansException;
  */
 
 /**
- * 允许自定义去修改应用上下文中的beanDefinnition，来适配底层上下文bean的属性值
+ * 允许自定义去修改应用上下文中的beanDefinition，来适配底层上下文bean的属性值
  */
 public interface BeanFactoryPostProcessor {
 
