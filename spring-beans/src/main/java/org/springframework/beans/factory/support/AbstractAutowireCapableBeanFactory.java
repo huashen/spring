@@ -442,6 +442,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * populates the bean instance, applies post-processors, etc.
 	 * @see #doCreateBean
 	 */
+
+	/**
+	 * 此类的中心方法创建一个bean实例，填充bean实例，应用于post-processors等。
+	 */
 	@Override
 	protected Object createBean(String beanName, RootBeanDefinition mbd, Object[] args) throws BeanCreationException {
 		if (logger.isDebugEnabled()) {

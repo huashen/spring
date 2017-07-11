@@ -234,6 +234,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
 			throws BeansException {
 
+		/**
+		 *  第一部分 首先先去singleton缓存中去找实例
+		 */
 		final String beanName = transformedBeanName(name);
 		Object bean;
 
@@ -251,6 +254,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
+
+		/* -------------------------------------------------------------------*/
 
 		else {
 			// Fail if we're already creating this bean instance:
