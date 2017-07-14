@@ -280,10 +280,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			if (!typeCheckOnly) {
-				markBeanAsCreated(beanName);
+				markBeanAsCreated(beanName); //标记当前Bean正在被创建
 			}
 
 			try {
+				/**
+				 * 根据beanName该bean在beanFactory中的beanDefinitionMap的BeanDefinition,
+				 * 然后去获取这个bean依赖的bean，如果依赖的bean还没有创建
+				 * 则先创建依赖的bean，递归调用，（Dependence Inject依赖注入的概念吧），如果找不到依赖，则忽略
+				 */
 				final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 				checkMergedBeanDefinition(mbd, beanName, args);
 
@@ -301,7 +306,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 
 				// Create bean instance.
-				if (mbd.isSingleton()) {
+				if (mbd.isSingleton()) {//是否是单例
 					sharedInstance = getSingleton(beanName, new ObjectFactory<Object>() {
 						@Override
 						public Object getObject() throws BeansException {
