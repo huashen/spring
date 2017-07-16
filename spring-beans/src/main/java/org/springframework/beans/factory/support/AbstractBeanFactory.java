@@ -1207,6 +1207,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @return a (potentially merged) RootBeanDefinition for the given bean
 	 * @throws BeanDefinitionStoreException in case of an invalid bean definition
 	 */
+	/**
+	 * 为给定的bean返回一个RootBeanDefinition
+	 */
 	protected RootBeanDefinition getMergedBeanDefinition(
 			String beanName, BeanDefinition bd, BeanDefinition containingBd)
 			throws BeanDefinitionStoreException {
