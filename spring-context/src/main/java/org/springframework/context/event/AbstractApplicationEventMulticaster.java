@@ -67,6 +67,7 @@ public abstract class AbstractApplicationEventMulticaster
 
 	private BeanFactory beanFactory;
 
+	//使用ListenerRetriever作为加锁对象
 	private Object retrievalMutex = this.defaultRetriever;
 
 
@@ -353,6 +354,7 @@ public abstract class AbstractApplicationEventMulticaster
 					}
 				}
 			}
+			//根据Order注解排序
 			AnnotationAwareOrderComparator.sort(allListeners);
 			return allListeners;
 		}
