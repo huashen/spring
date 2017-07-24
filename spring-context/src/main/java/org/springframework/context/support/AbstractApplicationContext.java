@@ -386,7 +386,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			throw new IllegalStateException("ApplicationEventMulticaster not initialized - " +
 					"call 'refresh' before multicasting events via the context: " + this);
 		}
-		return this.applicationEventMulticaster;
+		return this.applicationEventMulticaster;//广播器了已提前初始化好,前面refresh()方法里调用initApplicationEventMulticaster()实现
 	}
 
 	/**
@@ -523,6 +523,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Check for listener beans and register them.
 				//查询并校验监听器并校验
+				//注册系统里的监听者（观察者）
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
@@ -717,7 +718,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void initApplicationEventMulticaster() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
-		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
+		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {//可以自定义广播器，名字要取applicationEventMulticaster
 			this.applicationEventMulticaster =
 					beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
 			if (logger.isDebugEnabled()) {
@@ -726,6 +727,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 		else {
 			this.applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
+			//注册，广播器是单例的。
 			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Unable to locate ApplicationEventMulticaster with name '" +
@@ -841,6 +843,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		getLifecycleProcessor().onRefresh();
 
 		// Publish the final event.
+		/**
+		 * 发送一个完成事件ContextRefreshedEvent
+		 * ContextRefreshedEvent 继承自 ApplicationContextEvent
+		 * pplicationContextEvent 继承自 ApplicationEvent
+		 * 由于AbstractApplicationContext实现了ApplicationEventPublisher接口，所以它本身就是发布者
+		 */
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.

@@ -164,11 +164,12 @@ public abstract class AbstractApplicationEventMulticaster
 
 		Object source = event.getSource();
 		Class<?> sourceType = (source != null ? source.getClass() : null);
-		ListenerCacheKey cacheKey = new ListenerCacheKey(eventType, sourceType);
+		ListenerCacheKey cacheKey = new ListenerCacheKey(eventType, sourceType);//从cache里取
 
 		// Quick check for existing entry on ConcurrentHashMap...
 		ListenerRetriever retriever = this.retrieverCache.get(cacheKey);
-		if (retriever != null) {
+		//所有的listener对象，都放在retriever里的
+		if (retriever != null) {//有缓存，就直接返回
 			return retriever.getApplicationListeners();
 		}
 
@@ -212,6 +213,8 @@ public abstract class AbstractApplicationEventMulticaster
 			listenerBeans = new LinkedHashSet<String>(this.defaultRetriever.applicationListenerBeans);
 		}
 		for (ApplicationListener<?> listener : listeners) {
+			//这里要注意下，有个验证监听者和事件类型匹配操作
+			//具体验证法就是 监听器的接收事件类型是不是与当前类型匹配，用的是Class.isAssignableFrom这个方法。
 			if (supportsEvent(listener, eventType, sourceType)) {
 				if (retriever != null) {
 					retriever.applicationListeners.add(listener);
@@ -224,9 +227,11 @@ public abstract class AbstractApplicationEventMulticaster
 			for (String listenerBeanName : listenerBeans) {
 				try {
 					Class<?> listenerType = beanFactory.getType(listenerBeanName);
+					//验证
 					if (listenerType == null || supportsEvent(listenerType, eventType)) {
 						ApplicationListener<?> listener =
 								beanFactory.getBean(listenerBeanName, ApplicationListener.class);
+						//验证
 						if (!allListeners.contains(listener) && supportsEvent(listener, eventType, sourceType)) {
 							if (retriever != null) {
 								retriever.applicationListenerBeans.add(listenerBeanName);
