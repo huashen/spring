@@ -156,21 +156,25 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
 		if (delegate.isDefaultNamespace(root)) {
+			//解析默认标签
 			NodeList nl = root.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {//循环bean.xml中定义的每一个元素
 				Node node = nl.item(i);
 				if (node instanceof Element) {
 					Element ele = (Element) node;
 					if (delegate.isDefaultNamespace(ele)) {
+						//解析默认标签（子级嵌套）
 						parseDefaultElement(ele, delegate);
 					}
 					else {
+						//解析自定义标签（子级嵌套）
 						delegate.parseCustomElement(ele);
 					}
 				}
 			}
 		}
 		else {
+			//解析自定义标签
 			delegate.parseCustomElement(root);
 		}
 	}
@@ -291,12 +295,24 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * Process the given bean element, parsing the bean definition
 	 * and registering it with the registry.
 	 */
+	/**
+	   1.调用 BeanDefinitionParserDelegate 解析各个默认标签元素，将配置语义转换成 BeanDefinition 对象，
+	  	并包含在 BeanDefinitionHolder 中返回
+	   2.如果步骤 1 中的返回结果不为空，则检查当前标签下是否有自定义标签元素，若存在的话则进行解析
+	   3.注册由前两步得到的 BeanDefinitionHolder 对象
+	   4.发布事件消息，通知相应的监听者默认标签已经解析完毕的事件
+	 * @param ele
+	 * @param delegate
+	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
+		//1.解析bean元素：id name alias class
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
+			//2.如果默认标签下有自定义标签，则进行解析
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
 				// Register the final decorated instance.
+				//3.注册解析得到的 BeanDefinitionHolder
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
 			}
 			catch (BeanDefinitionStoreException ex) {
@@ -304,6 +320,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 						bdHolder.getBeanName() + "'", ele, ex);
 			}
 			// Send registration event.
+			/**
+			 * 4.发出响应事件，通知相关监听器，这个bean已经加载完了，这里的实现只是为了扩展，
+			 * spring自己并没有对注册实现做任何扩展逻辑
+			 */
 			getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
 		}
 	}
