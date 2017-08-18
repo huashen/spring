@@ -434,18 +434,30 @@ public class BeanDefinitionParserDelegate {
 	 * if there were errors during parse. Errors are reported to the
 	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
 	 */
+
+	/**
+	 *
+	 1.获取 id 和 name 属性，并检查属性值在整个配置中的唯一性
+	 2.解析其它属性元素，封装成 GenericBeanDefinition 对象
+	 3.Spring 会以 id 或者第一个 name 值作为 bean 的唯一标识，如果发现没有设置对应的 beanName，则会按照命名规则自动生成一个
+	 4.将解析得到的 beanDefinition 实例、beanName、以及 alias 列表封装到 BeanDefinitionHolder 中返回
+	 */
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, BeanDefinition containingBean) {
+		//获取id
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		//获取name
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
 		List<String> aliases = new ArrayList<String>();
 		if (StringUtils.hasLength(nameAttr)) {
+			//如果配置了多个name(以逗号、分号，或者空格分隔),则解析成list
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
 		String beanName = id;
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
+			//没有配置id属性，但至少配置了一个name，则以第一个name作为id
 			beanName = aliases.remove(0);
 			if (logger.isDebugEnabled()) {
 				logger.debug("No XML 'id' specified - using '" + beanName +
@@ -454,13 +466,16 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		if (containingBean == null) {
+			//检查name和alias在容器中的唯一性
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
+		//解析标签
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
 				try {
+					//如果不存在beanName，那么按照命名规则自动生成一个
 					if (containingBean != null) {
 						beanName = BeanDefinitionReaderUtils.generateBeanName(
 								beanDefinition, this.readerContext.getRegistry(), true);
@@ -470,6 +485,7 @@ public class BeanDefinitionParserDelegate {
 						// Register an alias for the plain bean class name, if still possible,
 						// if the generator returned the class name plus a suffix.
 						// This is expected for Spring 1.2/2.0 backwards compatibility.
+						// 注册一个alias
 						String beanClassName = beanDefinition.getBeanClassName();
 						if (beanClassName != null &&
 								beanName.startsWith(beanClassName) && beanName.length() > beanClassName.length() &&
@@ -488,6 +504,7 @@ public class BeanDefinitionParserDelegate {
 				}
 			}
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
+			//封装获取到的信息到BeanDefinitionHolder返回
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}
 
