@@ -706,16 +706,26 @@ public class BeanDefinitionParserDelegate {
 				parentName, className, this.readerContext.getBeanClassLoader());
 	}
 
+    /**
+     * 容器是将 meta 配置值利用 BeanMetadataAttribute 封装成一个对象
+     * 并记录到 BeanMetadataAttributeAccessor 实例的 attributes 中
+     * 这是一个 map 型的数据结构，而我们之所以可以从 BeanDefinition 实例中拿到配置值
+     * 是因为 BeanDefinition 实现了 BeanMetadataAttributeAccessor 所实现的接口 AttributeAccessor
+     */
 	public void parseMetaElements(Element ele, BeanMetadataAttributeAccessor attributeAccessor) {
+        //获取当前节点的所有子标签
 		NodeList nl = ele.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+            //提取meta标签：<meta />
 			if (isCandidateElement(node) && nodeNameEquals(node, META_ELEMENT)) {
 				Element metaElement = (Element) node;
 				String key = metaElement.getAttribute(KEY_ATTRIBUTE);
 				String value = metaElement.getAttribute(VALUE_ATTRIBUTE);
+                //使用key, value构造BeanMetadataAttribute
 				BeanMetadataAttribute attribute = new BeanMetadataAttribute(key, value);
 				attribute.setSource(extractSource(metaElement));
+                //记录信息
 				attributeAccessor.addMetadataAttribute(attribute);
 			}
 		}
