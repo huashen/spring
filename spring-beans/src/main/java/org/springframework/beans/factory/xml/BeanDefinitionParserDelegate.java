@@ -861,10 +861,11 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a constructor-arg element.
 	 */
 	public void parseConstructorArgElement(Element ele, BeanDefinition bd) {
-		String indexAttr = ele.getAttribute(INDEX_ATTRIBUTE);
-		String typeAttr = ele.getAttribute(TYPE_ATTRIBUTE);
-		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
+		String indexAttr = ele.getAttribute(INDEX_ATTRIBUTE);//index
+		String typeAttr = ele.getAttribute(TYPE_ATTRIBUTE);//type
+		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);//name
 		if (StringUtils.hasLength(indexAttr)) {
+			//设置了index属性
 			try {
 				int index = Integer.parseInt(indexAttr);
 				if (index < 0) {
@@ -873,19 +874,24 @@ public class BeanDefinitionParserDelegate {
 				else {
 					try {
 						this.parseState.push(new ConstructorArgumentEntry(index));
+						//解析标签元素，复用 <property/> 标签的解析过程
 						Object value = parsePropertyValue(ele, bd, null);
 						ConstructorArgumentValues.ValueHolder valueHolder = new ConstructorArgumentValues.ValueHolder(value);
 						if (StringUtils.hasLength(typeAttr)) {
+							//如果设置了type属性
 							valueHolder.setType(typeAttr);
 						}
 						if (StringUtils.hasLength(nameAttr)) {
+							//如果设置了name属性
 							valueHolder.setName(nameAttr);
 						}
 						valueHolder.setSource(extractSource(ele));
 						if (bd.getConstructorArgumentValues().hasIndexedArgumentValue(index)) {
+							//不允许有重复的index
 							error("Ambiguous constructor-arg entries for index " + index, ele);
 						}
 						else {
+							//记录index对应的构造参数ValueHolder对象
 							bd.getConstructorArgumentValues().addIndexedArgumentValue(index, valueHolder);
 						}
 					}
@@ -899,17 +905,22 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 		else {
+			//没有设置index属性
 			try {
 				this.parseState.push(new ConstructorArgumentEntry());
+				//解析标签元素，复用 <property/> 标签的解析过程
 				Object value = parsePropertyValue(ele, bd, null);
 				ConstructorArgumentValues.ValueHolder valueHolder = new ConstructorArgumentValues.ValueHolder(value);
 				if (StringUtils.hasLength(typeAttr)) {
+					//如果设置了type属性
 					valueHolder.setType(typeAttr);
 				}
 				if (StringUtils.hasLength(nameAttr)) {
+					//如果设置了name属性
 					valueHolder.setName(nameAttr);
 				}
 				valueHolder.setSource(extractSource(ele));
+				//依据type或name做参数映射
 				bd.getConstructorArgumentValues().addGenericArgumentValue(valueHolder);
 			}
 			finally {
