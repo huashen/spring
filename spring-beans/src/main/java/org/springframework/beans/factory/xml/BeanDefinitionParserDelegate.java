@@ -860,6 +860,18 @@ public class BeanDefinitionParserDelegate {
 	/**
 	 * Parse a constructor-arg element.
 	 */
+
+    /**
+     * 如果设置了 index 属性
+     * 1. 解析构造参数标签元素，这里复用了 标签的解析过程。
+       2. 利用 ValueHolder 封装解析出来的元素值，并设置 type 和 name 属性值添加到 ValueHolder 对象中。
+       3. 检查是否存在重复的 index，没有的话就以 index 为 key，将 ValueHolder 对象以 Map 的形式存储到 beanDefinition 实例中
+
+       如果没有设置 index 属性
+        1. 解析构造参数标签元素，这里复用了 标签的解析过程。
+        2. 利用 ValueHolder 封装解析出来的元素值，并设置 type 和 name 属性值添加到 ValueHolder 对象中。
+        3. 以 type 或 name 去推断当前 ValueHolder 对象所对应的参数，并以 List 的形式存储到 beanDefinition 实例中
+     */
 	public void parseConstructorArgElement(Element ele, BeanDefinition bd) {
 		String indexAttr = ele.getAttribute(INDEX_ATTRIBUTE);//index
 		String typeAttr = ele.getAttribute(TYPE_ATTRIBUTE);//type
