@@ -794,6 +794,7 @@ public class BeanDefinitionParserDelegate {
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
 			if (isCandidateElement(node) && nodeNameEquals(node, PROPERTY_ELEMENT)) {
+				// 是候选元素或者是 <property/> 标签
 				parsePropertyElement((Element) node, bd);
 			}
 		}
@@ -945,6 +946,7 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a property element.
 	 */
 	public void parsePropertyElement(Element ele, BeanDefinition bd) {
+		//获取标签name属性
 		String propertyName = ele.getAttribute(NAME_ATTRIBUTE);
 		if (!StringUtils.hasLength(propertyName)) {
 			error("Tag 'property' must have a 'name' attribute", ele);
@@ -953,16 +955,21 @@ public class BeanDefinitionParserDelegate {
 		this.parseState.push(new PropertyEntry(propertyName));
 		try {
 			if (bd.getPropertyValues().contains(propertyName)) {
+				//name必须是唯一的
 				error("Multiple 'property' definitions for property '" + propertyName + "'", ele);
 				return;
 			}
+			//解析标签value配置
 			Object val = parsePropertyValue(ele, bd, propertyName);
 			PropertyValue pv = new PropertyValue(propertyName, val);
+			//解析标签内的<meta/>
 			parseMetaElements(ele, pv);
 			pv.setSource(extractSource(ele));
+			//添加property元素，本质上添加到一个list中
 			bd.getPropertyValues().addPropertyValue(pv);
 		}
 		finally {
+			//出栈
 			this.parseState.pop();
 		}
 	}

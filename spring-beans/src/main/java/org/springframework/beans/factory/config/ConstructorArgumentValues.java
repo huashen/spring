@@ -215,6 +215,7 @@ public class ConstructorArgumentValues {
 	public void addGenericArgumentValue(ValueHolder newValue) {
 		Assert.notNull(newValue, "ValueHolder must not be null");
 		if (!this.genericArgumentValues.contains(newValue)) {
+			//ValueHolder 对象必须之前没有加载过
 			addOrMergeGenericArgumentValue(newValue);
 		}
 	}
@@ -224,8 +225,16 @@ public class ConstructorArgumentValues {
 	 * with the current value if demanded: see {@link org.springframework.beans.Mergeable}.
 	 * @param newValue the argument value in the form of a ValueHolder
 	 */
+
+	/**
+	 * 检查当前 ValueHolder 对象是否之前有加载过，
+	 * 没有的话则判断当前参数是否设置了 name 属性，
+	 * 如果有设置且当前 ValueHolder 对象与已有的 ValueHolder 对象存在相同的 name，
+	 * 则尝试将这个两个对象做 merge 操作，最后记录 ValueHolder 对象到 genericArgumentValues 属性中，这是一个 List
+	 */
 	private void addOrMergeGenericArgumentValue(ValueHolder newValue) {
 		if (newValue.getName() != null) {
+			//如果在录的参数对象存在与当前相同的参数名称，则尝试merge操作
 			for (Iterator<ValueHolder> it = this.genericArgumentValues.iterator(); it.hasNext();) {
 				ValueHolder currentValue = it.next();
 				if (newValue.getName().equals(currentValue.getName())) {
