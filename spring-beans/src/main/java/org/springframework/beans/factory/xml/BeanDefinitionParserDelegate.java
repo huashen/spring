@@ -978,6 +978,7 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a qualifier element.
 	 */
 	public void parseQualifierElement(Element ele, AbstractBeanDefinition bd) {
+		//获取type属性
 		String typeName = ele.getAttribute(TYPE_ATTRIBUTE);
 		if (!StringUtils.hasLength(typeName)) {
 			error("Tag 'qualifier' must have a 'type' attribute", ele);
@@ -985,22 +986,27 @@ public class BeanDefinitionParserDelegate {
 		}
 		this.parseState.push(new QualifierEntry(typeName));
 		try {
+			//封装qualifier配置
 			AutowireCandidateQualifier qualifier = new AutowireCandidateQualifier(typeName);
 			qualifier.setSource(extractSource(ele));
 			String value = ele.getAttribute(VALUE_ATTRIBUTE);
 			if (StringUtils.hasLength(value)) {
+				//value属性是可选的
 				qualifier.setAttribute(AutowireCandidateQualifier.VALUE_KEY, value);
 			}
 			NodeList nl = ele.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
+				//获取attribute子标签
 				if (isCandidateElement(node) && nodeNameEquals(node, QUALIFIER_ATTRIBUTE_ELEMENT)) {
 					Element attributeEle = (Element) node;
 					String attributeName = attributeEle.getAttribute(KEY_ATTRIBUTE);
 					String attributeValue = attributeEle.getAttribute(VALUE_ATTRIBUTE);
 					if (StringUtils.hasLength(attributeName) && StringUtils.hasLength(attributeValue)) {
+						//封装attribute配置
 						BeanMetadataAttribute attribute = new BeanMetadataAttribute(attributeName, attributeValue);
 						attribute.setSource(extractSource(attributeEle));
+						//存储到qualifier对象中
 						qualifier.addMetadataAttribute(attribute);
 					}
 					else {
@@ -1009,6 +1015,7 @@ public class BeanDefinitionParserDelegate {
 					}
 				}
 			}
+			//将qualifier对象存储到beanDefinition对象中
 			bd.addQualifier(qualifier);
 		}
 		finally {
