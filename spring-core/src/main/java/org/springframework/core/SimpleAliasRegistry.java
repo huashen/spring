@@ -46,17 +46,21 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		Assert.hasText(name, "'name' must not be empty");
 		Assert.hasText(alias, "'alias' must not be empty");
 		if (alias.equals(name)) {
+			//如果alias等于name，则将alias从map中删除
 			this.aliasMap.remove(alias);
 		}
 		else {
 			if (!allowAliasOverriding()) {
+				//尝试获取alias对应的beanName
 				String registeredName = this.aliasMap.get(alias);
 				if (registeredName != null && !registeredName.equals(name)) {
 					throw new IllegalStateException("Cannot register alias '" + alias + "' for name '" +
 							name + "': It is already registered for name '" + registeredName + "'.");
 				}
 			}
+			//检测name和alias之间是否构成环路，如果构成环路则抛出异常
 			checkForAliasCircle(name, alias);
+			//不存在环路，直接注册，建立alias与name之间的映射关系
 			this.aliasMap.put(alias, name);
 		}
 	}

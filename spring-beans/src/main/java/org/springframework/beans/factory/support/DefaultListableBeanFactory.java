@@ -803,6 +803,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
+				/**
+				 * 校验AbstractBeanDefinition属性中的methodOverrides
+				 * 是否与工厂方法并存或覆盖的方法根本不存在
+				 */
 				((AbstractBeanDefinition) beanDefinition).validate();
 			}
 			catch (BeanDefinitionValidationException ex) {
@@ -812,9 +816,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 
 		BeanDefinition oldBeanDefinition;
-
+		//尝试获取beanName是否已经绑定了BeanDefinition
 		oldBeanDefinition = this.beanDefinitionMap.get(beanName);
+		//对应beanName已经绑定了尝试获取beanName是否已经绑定了BeanDefinition
 		if (oldBeanDefinition != null) {
+			//不允许覆盖绑定
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
 						"Cannot register bean definition [" + beanDefinition + "] for bean '" + beanName +
@@ -848,6 +854,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			this.manualSingletonNames.remove(beanName);
 			this.frozenBeanDefinitionNames = null;
 		}
+		// 注册，用map保存注册信息
 		this.beanDefinitionMap.put(beanName, beanDefinition);
 
 		if (oldBeanDefinition != null || containsSingleton(beanName)) {
