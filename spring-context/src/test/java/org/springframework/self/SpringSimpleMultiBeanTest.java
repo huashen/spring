@@ -2,6 +2,7 @@ package org.springframework.self;
 
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.self.aop.TestBean;
 
 /**
  * SpringSimpleMultiBeanTest
@@ -23,10 +24,16 @@ public class SpringSimpleMultiBeanTest {
 
     @Test
     public void test() {
+//        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
+//                new String[] {CONTEXT}, getClass());
+//        SpringSimpleMultiBean springMultiBean = (SpringSimpleMultiBean)ctx.getBean("springMultiBean");
+//        springMultiBean.say();
+
+        //调试aop
         ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
-                new String[] {CONTEXT}, getClass());
-        SpringSimpleMultiBean springMultiBean = (SpringSimpleMultiBean)ctx.getBean("springMultiBean");
-        springMultiBean.say();
+                new String[]{CONTEXT}, getClass());
+        TestBean bean = (TestBean) ctx.getBean("test");
+        bean.test();
 
 //        SpringOtherBean springOtherBean = ctx.getBean("springOtherBean",SpringOtherBean.class);
 //        springOtherBean.say();
