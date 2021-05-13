@@ -332,6 +332,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
 			//创建代理...创建代理...创建代理...
+			// 注意看这个方法的几个参数，
+			//第三个参数携带了所有的 advisors
+			//第四个参数 targetSource 携带了真实实现的信息
 			Object proxy = createProxy(bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
 			this.proxyTypes.put(cacheKey, proxy.getClass());
 			return proxy;
@@ -421,17 +424,23 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	protected Object createProxy(
 			Class<?> beanClass, String beanName, Object[] specificInterceptors, TargetSource targetSource) {
 
+		// 创建 ProxyFactory 实例
 		ProxyFactory proxyFactory = new ProxyFactory();
 		//获取当前类中相关属性
 		proxyFactory.copyFrom(this);
 
 		//决定对给定的Bean是否应该使用 targetClass 而不是他的代理
 		//检查 proxyTargetClass 设置以及 preserveTargetClass 属性
+		// 在 schema-based 的配置方式中，如果希望使用 CGLIB 来代理接口，可以配置
+		// proxy-target-class="true",这样不管有没有接口，都使用 CGLIB 来生成代理：
+		// <aop:config proxy-target-class="true">......</aop:config>
 		if (!proxyFactory.isProxyTargetClass()) {
 			if (shouldProxyTargetClass(beanClass, beanName)) {
 				proxyFactory.setProxyTargetClass(true);
 			}
 			else {
+				// 1. 有接口的，调用一次或多次：proxyFactory.addInterface(ifc);
+				// 2. 没有接口的，调用：proxyFactory.setProxyTargetClass(true);
 				evaluateProxyInterfaces(beanClass, proxyFactory);
 			}
 		}
