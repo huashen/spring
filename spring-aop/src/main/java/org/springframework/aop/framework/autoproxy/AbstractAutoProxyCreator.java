@@ -318,9 +318,15 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (beanName != null && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
+		// 判断是否不应该代理这个bean
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
+		/*
+		 * 判断是否是一些InfrastructureClass或者是否应该跳过这个bean。
+		 * 所谓InfrastructureClass就是指Advice/PointCut/Advisor等接口的实现类。
+		 * shouldSkip默认实现为返回false,由于是protected方法，子类可以覆盖。
+		 */
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
